@@ -12,7 +12,7 @@ class Rol extends Model
     use HasFactory;
     use softDeletes;
     public function user(){
-        public $this->belongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
 }
