@@ -15,7 +15,20 @@ class LibroController extends Controller
      */
     public function index()
     {
-        //
+        $libro = Libro::all();
+        if($libro == NULL){
+            return "No existen libros";
+        }
+        return response()->json($libro);
+    }
+
+
+    public function vistaLibro($libro){
+        $foundLibro = Libro::findOrFail($libro);
+
+        return view('vistaLibro',[
+            'libro'=>$foundLibro
+        ]);
     }
 
     /**
@@ -42,10 +55,7 @@ class LibroController extends Controller
         $libro->fecha_publicacion = $request->fecha_publicacion;
         $libro->autor = $request->autor;
         $libro->save();
-        return response()->json([
-            "message" => "Se creo un nuevo libro",
-            "id" => $libro->id
-        ]);
+        return redirect('/home');
     }
 
     /**

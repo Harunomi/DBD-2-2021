@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -39,17 +40,39 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $user = new User;
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = $request->password;
-        $user->id_role = $request->id_role;
-        $user->save();
+        $validarDatos = Validator::make($request->all(),
+            [
+                'name'=>'required|min:4|max:30|unique:users,name',
+                'password' => [
+                    'required',
+                    'string',
+                    'min:8',             // must be at least 8 characters in length
+                    'regex:/[a-z]/',      // must contain at least one lowercase letter
+                    'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                    'regex:/[0-9]/',      // must contain at least one digit
+                ],
+                'email'=>'required|max:30|unique:users,email',
+            ],
+            [
+                'name.required'=>'Debes ingresar un nombre',
+                'name.min'=>'El nombre debe ser de largo mínimo :min',
+                'name.max'=>'El nombre debe ser de largo máximo :max', 
+                'password.required'=>'Debe ingresar una contraseña',
+                'password.regex'=>'La contraseña debe cumplir el formato',
+                'email.required'=>'Debe ingresar un correo electronico',
+                'email.unique'=>'El correo electronico ya existe'
+            ]
+            );
+            $validarDatos->validate();
 
-        return response()->json([
-            "message"=>"Se ha creado un nuevo usuario",
-            "id" =>$user->id
-        ]);
+            $user = new User;
+            $user->name = $request->name;
+            $user->password = $request->password;
+            $user->email = $request->email;
+            $user->id_rol = 1;
+            $user->save();
+            return redirect('/');
+
 
     }
 
@@ -111,7 +134,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User:find($id);
+        $user = User::find($id);
         if($user == NULL){
             return "No se ha encontrado un usuario con esa ID";
         }

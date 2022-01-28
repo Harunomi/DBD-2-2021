@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+
+class RegisterController extends Controller
+{
+    public function register()
+    {
+        $users = User::all();        
+        return view('register', [
+            'users' => $users,  
+        ]);
+    }
+}
